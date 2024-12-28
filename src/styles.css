@@ -82,6 +82,7 @@ body {
 #menu {
     display: flex;
     flex-direction: column;
+    gap: 10px;
     align-items: center;
     justify-content: center;
     width: 80%;
@@ -109,12 +110,30 @@ body {
     margin: 8px 0;
 }
 
+.play-again-button {
+    width: 100%;
+    max-width: 200px;
+    font-size: 1.2rem;
+    font-weight: bold;
+    background: linear-gradient(145deg, #16a085, #139270);
+    color: #ecf0f1;
+    padding: 12px;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: background 0.3s, transform 0.2s, box-shadow 0.2s;
+}
+
+.play-again-button:hover {
+    background: linear-gradient(145deg, #139270, #108260);
+}
+
 .reset-button {
     width: 100%;
     max-width: 200px;
     font-size: 1.2rem;
     font-weight: bold;
-    background: linear-gradient(145deg, #e74c3c, #d84332);
+    background: linear-gradient(145deg, #e74c3c, #c0392b);
     color: #ecf0f1;
     padding: 12px;
     border: none;
@@ -126,3 +145,4 @@ body {
 .reset-button:hover {
     background: linear-gradient(145deg, #d84332, #c0392b);
 }
+

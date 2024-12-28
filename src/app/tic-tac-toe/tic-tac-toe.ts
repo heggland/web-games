@@ -54,16 +54,24 @@ export default class TicTacToe {
         this.scoreboardElement = scoreboardElement;
         menu.appendChild(scoreboardElement);
 
-        const resetButton = document.createElement('button');
-        resetButton.textContent = 'Reset';
-        resetButton.classList.add('reset-button');
+        const playAgainButton = document.createElement('button');
+        playAgainButton.textContent = 'Play Again';
+        playAgainButton.classList.add('play-again-button');
 
-        resetButton.addEventListener('click', () => {
+        playAgainButton.addEventListener('click', () => {
             this.hideMenu();
         });
 
+        const resetButton = document.createElement('button');
+        resetButton.textContent = 'Reset';
+        resetButton.classList.add('reset-button');
+        resetButton.addEventListener('click', () => {
+            this.reloadGame();
+            this.hideMenu();
+        });
 
-        this.resetButtonElement = resetButton;
+        this.resetButtonElement = playAgainButton;
+        menu.appendChild(playAgainButton);
         menu.appendChild(resetButton);
 
         const boardElement = document.createElement('div');
@@ -80,6 +88,15 @@ export default class TicTacToe {
 
         document.body.appendChild(container);
 
+        this.renderBoard();
+        this.updateStatus(`Player ${this.currentPlayer}'s turn`);
+        this.renderScoreboard();
+    }
+
+    reloadGame() {
+        this.board = Array(9).fill(null);
+        this.currentPlayer = 'X';
+        this.gameOver = false;
         this.renderBoard();
         this.updateStatus(`Player ${this.currentPlayer}'s turn`);
         this.renderScoreboard();
@@ -115,6 +132,9 @@ export default class TicTacToe {
         this.board = Array(9).fill(null);
         this.switchPlayer(player);
         this.gameOver = false;
+        this.xWins = 0;
+        this.oWins = 0;
+        this.draws = 0;
         this.renderBoard();
         this.updateStatus(`Player ${player}'s turn`);
         this.renderScoreboard();
@@ -178,11 +198,16 @@ export default class TicTacToe {
             }
         }
 
-        if (!this.board.includes(null)) {
+        const movesLeft = this.board.filter(cell => cell === null).length;
+        if (movesLeft === 0) {
             this.gameOver = true;
             this.updateStatus('Draw!');
+            this.draws++;
+            this.renderScoreboard();
             return true;
         }
+
+        return false;
     }
 
     updateStatus(message: string) {
@@ -199,9 +224,6 @@ export default class TicTacToe {
                 break;
             case 'O':
                 this.oWins++;
-                break;
-            default:
-                this.draws++;
                 break;
         }
 
@@ -226,3 +248,4 @@ export default class TicTacToe {
         }
     }
 }
+
