@@ -1,0 +1,11 @@
+services:
+  games-heggland:
+    build: ./
+    container_name: games.heggland.tech
+    networks:
+      - nginx-app-network
+    restart: always
+
+networks:
+  nginx-app-network:
+    external: true
