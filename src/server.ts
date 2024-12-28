@@ -2,26 +2,27 @@ import * as http from "http";
 import * as path from "path";
 import * as fs from "fs";
 import { IncomingMessage, ServerResponse } from "http";
+import { transformSync } from "esbuild";
 import RenderHtmlPage from "./utils/renderHtml";
 
 const server = http.createServer((req: IncomingMessage, res: ServerResponse) => {
-    let filePath = req.url === "/" ? "index" : req.url!.substring(1); // Remove leading "/"
+    const filePath = req.url === "/" ? "index.html" : req.url!.substring(1);
     const fullPath = path.join(__dirname, filePath);
 
-    // Determine MIME type
     const mimeType: Record<string, string> = {
         ".html": "text/html",
         ".js": "application/javascript",
         ".css": "text/css",
         ".png": "image/png",
         ".jpg": "image/jpeg",
+        ".ts": "application/javascript", // load transpiled TypeScript as JavaScript ඞ
     };
     const ext = path.extname(filePath);
     const contentType = mimeType[ext] || "application/octet-stream";
 
-    if (ext === ".css" || ext === ".js" || ext === ".png" || ext === ".jpg") {
-        // Serve static files as usual
-        fs.readFile(fullPath, (err: any, data: any) => {
+    // Serve static files (CSS, JS, PNG, JPG),  transpile TypeScript files on the fly, render index.html
+    if ([".css", ".js", ".png", ".jpg"].includes(ext)) {
+        fs.readFile(fullPath, (err, data) => {
             if (err) {
                 res.writeHead(404, { "Content-Type": "text/plain" });
                 res.end("404 Not Found");
@@ -30,16 +31,39 @@ const server = http.createServer((req: IncomingMessage, res: ServerResponse) => 
                 res.end(data);
             }
         });
-    } else {
+    }
+    else if (ext === ".ts") {
+        try {
+            const tsContent = fs.readFileSync(fullPath, "utf-8");
+            const transpiledCode = transformSync(tsContent, {
+                loader: "ts",
+                target: "es6",
+                format: "esm",
+            }).code;
+
+            res.writeHead(200, { "Content-Type": "application/javascript" });
+            res.end(transpiledCode);
+        } catch (err) {
+            res.writeHead(500, { "Content-Type": "text/plain" });
+            res.end("Error transpiling TypeScript file");
+            console.error(err);
+        }
+    }
+    else if (filePath === "index.html") {
         const html = new RenderHtmlPage("web-games");
-        html.setDescription("games made for fun");
+        html.setDescription("Games made for fun");
+
+        const appPath = "./app/index.ts";
+        html.addScript(appPath);
+
         const htmlContent = html.renderLayout();
 
-        const scriptTag = '<script src="../../dist/app/index.js"></script>';
-        const htmlWithScript = htmlContent.replace("</body>", `${scriptTag}</body>`);
-
         res.writeHead(200, { "Content-Type": "text/html" });
-        res.end(htmlWithScript);
+        res.end(htmlContent);
+    }
+    else {
+        res.writeHead(404, { "Content-Type": "text/plain" });
+        res.end("404 Not Found");
     }
 });
 
