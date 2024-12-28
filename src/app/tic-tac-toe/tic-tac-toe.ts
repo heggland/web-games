@@ -1,6 +1,6 @@
 type Player = 'X' | 'O' | null;
 
-class TicTacToe {
+export default class TicTacToe {
     private board: Player[];
     private currentPlayer: Player;
     private gameOver: boolean = false;
@@ -28,7 +28,7 @@ class TicTacToe {
     }
 
     renderGame() {
-        const container = document.createElement('div');
+        const container= document.createElement('div');
         container.classList.add('container');
 
         const header = document.createElement('div');
@@ -226,5 +226,3 @@ class TicTacToe {
         }
     }
 }
-
-new TicTacToe();
