@@ -31,13 +31,15 @@ const server = http.createServer((req: IncomingMessage, res: ServerResponse) => 
             }
         });
     } else {
-        // Serve dynamic HTML page
-        const renderer = new RenderHtmlPage("My Dynamic Page");
-        renderer.setDescription("This is a dynamically generated page.");
-        const htmlContent = renderer.renderLayout();
+        const html = new RenderHtmlPage("web-games");
+        html.setDescription("games made for fun");
+        const htmlContent = html.renderLayout();
+
+        const scriptTag = '<script src="../../dist/app/index.js"></script>';
+        const htmlWithScript = htmlContent.replace("</body>", `${scriptTag}</body>`);
 
         res.writeHead(200, { "Content-Type": "text/html" });
-        res.end(htmlContent);
+        res.end(htmlWithScript);
     }
 });
 
