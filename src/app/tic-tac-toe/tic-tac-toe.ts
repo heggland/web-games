@@ -62,6 +62,9 @@ export default class TicTacToe {
             this.hideMenu();
         });
 
+        this.resetButtonElement = playAgainButton;
+        menu.appendChild(playAgainButton);
+
         const resetButton = document.createElement('button');
         resetButton.textContent = 'Reset';
         resetButton.classList.add('reset-button');
@@ -70,8 +73,7 @@ export default class TicTacToe {
             this.hideMenu();
         });
 
-        this.resetButtonElement = playAgainButton;
-        menu.appendChild(playAgainButton);
+
         menu.appendChild(resetButton);
 
         const boardElement = document.createElement('div');
