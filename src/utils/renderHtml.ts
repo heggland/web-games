@@ -7,6 +7,12 @@ class RenderHtmlPage {
   private author: string = '';
   private robots: string = '';
   private bodyContent: string = '';
+  private cssContent: string = '';
+  private scripts: string[] = [];
+
+  addScript(scriptPath: string) {
+    this.scripts.push(scriptPath);
+  }
 
   constructor(title: string, language: string = 'en') {
     this.title = title;
@@ -38,6 +44,7 @@ class RenderHtmlPage {
             </head>
             <body>
             ${this.bodyContent}
+            ${this.scripts.map((script) => `<script type="module" src="${script}"></script>`).join('')}
             </body>
             </html>
         `;
