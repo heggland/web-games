@@ -1,23 +1,24 @@
 "use strict";
 class TicTacToe {
+    board;
+    currentPlayer;
+    gameOver = false;
+    xWins = 0;
+    oWins = 0;
+    draws = 0;
+    menuVisible = false;
+    foreground = null;
+    menuElement = null;
+    scoreboardElement = null;
+    resetButtonElement = null;
+    boardElement = null;
+    statusElement = null;
     constructor() {
-        var _a;
-        this.gameOver = false;
-        this.xWins = 0;
-        this.oWins = 0;
-        this.draws = 0;
-        this.menuVisible = false;
-        this.foreground = null;
-        this.menuElement = null;
-        this.scoreboardElement = null;
-        this.resetButtonElement = null;
-        this.boardElement = null;
-        this.statusElement = null;
         this.board = Array(9).fill(null);
         this.currentPlayer = 'X';
         this.renderGame();
         if (this.menuVisible) {
-            (_a = this.foreground) === null || _a === void 0 ? void 0 : _a.setAttribute('data-visible', 'true');
+            this.foreground?.setAttribute('data-visible', 'true');
         }
     }
     renderGame() {
@@ -65,17 +66,15 @@ class TicTacToe {
         this.renderScoreboard();
     }
     hideMenu() {
-        var _a;
-        (_a = this.foreground) === null || _a === void 0 ? void 0 : _a.removeAttribute('data-visible');
+        this.foreground?.removeAttribute('data-visible');
         this.menuVisible = false;
     }
     showMenu() {
-        var _a;
         if (this.menuVisible)
             return;
         if (!this.menuElement)
             return;
-        (_a = this.foreground) === null || _a === void 0 ? void 0 : _a.setAttribute('data-visible', 'true');
+        this.foreground?.setAttribute('data-visible', 'true');
         this.menuVisible = true;
     }
     renderBoard() {
@@ -92,14 +91,13 @@ class TicTacToe {
         }
     }
     resetGame(player) {
-        var _a;
         this.board = Array(9).fill(null);
         this.switchPlayer(player);
         this.gameOver = false;
         this.renderBoard();
         this.updateStatus(`Player ${player}'s turn`);
         this.renderScoreboard();
-        (_a = this.foreground) === null || _a === void 0 ? void 0 : _a.classList.add('hidden');
+        this.foreground?.classList.add('hidden');
     }
     handleCellClick(index) {
         if (this.gameOver || this.board[index])
