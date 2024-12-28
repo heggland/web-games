@@ -62,7 +62,6 @@ export default class TicTacToe {
             this.hideMenu();
         });
 
-
         this.resetButtonElement = resetButton;
         menu.appendChild(resetButton);
 
@@ -178,11 +177,16 @@ export default class TicTacToe {
             }
         }
 
-        if (!this.board.includes(null)) {
+        const movesLeft = this.board.filter(cell => cell === null).length;
+        if (movesLeft === 0) {
             this.gameOver = true;
             this.updateStatus('Draw!');
+            this.draws++;
+            this.renderScoreboard();
             return true;
         }
+
+        return false;
     }
 
     updateStatus(message: string) {
@@ -199,9 +203,6 @@ export default class TicTacToe {
                 break;
             case 'O':
                 this.oWins++;
-                break;
-            default:
-                this.draws++;
                 break;
         }
 
