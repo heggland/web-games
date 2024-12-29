@@ -4,6 +4,7 @@ export default class TicTacToe {
     private board: Player[];
     private currentPlayer: Player;
     private gameOver: boolean = false;
+    private winner: Player | null = null;
     private xWins: number = 0;
     private oWins: number = 0;
     private draws: number = 0;
@@ -13,6 +14,7 @@ export default class TicTacToe {
     private menuElement: HTMLDivElement | null = null;
     private scoreboardElement: HTMLDivElement | null = null;
     private resetButtonElement: HTMLButtonElement | null = null;
+    private playAgainButtonElement: HTMLButtonElement | null = null;
     private boardElement: HTMLDivElement | null = null;
     private statusElement: HTMLDivElement | null = null;
 
@@ -59,10 +61,12 @@ export default class TicTacToe {
         playAgainButton.classList.add('play-again-button');
 
         playAgainButton.addEventListener('click', () => {
+            const player = this.getNextPlayer();
+            this.resetGame(player);
             this.hideMenu();
         });
+        this.playAgainButtonElement = playAgainButton;
 
-        this.resetButtonElement = playAgainButton;
         menu.appendChild(playAgainButton);
 
         const resetButton = document.createElement('button');
@@ -72,6 +76,7 @@ export default class TicTacToe {
             this.reloadGame();
             this.hideMenu();
         });
+        this.resetButtonElement = resetButton;
 
 
         menu.appendChild(resetButton);
@@ -95,27 +100,6 @@ export default class TicTacToe {
         this.renderScoreboard();
     }
 
-    reloadGame() {
-        this.board = Array(9).fill(null);
-        this.currentPlayer = 'X';
-        this.gameOver = false;
-        this.renderBoard();
-        this.updateStatus(`Player ${this.currentPlayer}'s turn`);
-        this.renderScoreboard();
-    }
-
-    hideMenu() {
-        this.foreground?.removeAttribute('data-visible');
-        this.menuVisible = false;
-    }
-
-    showMenu() {
-        if (this.menuVisible) return;
-        if (!this.menuElement) return;
-        this.foreground?.setAttribute('data-visible', 'true');
-        this.menuVisible = true;
-    }
-
     renderBoard() {
         const boardElement = this.boardElement;
         if (boardElement) {
@@ -130,13 +114,63 @@ export default class TicTacToe {
         }
     }
 
+    renderScoreboard() {
+        const scoreboardElement = this.scoreboardElement;
+
+        if (scoreboardElement) {
+            scoreboardElement.innerHTML = '';
+
+            const winnerDiv = document.createElement('div');
+            winnerDiv.classList.add('winner');
+            winnerDiv.textContent = `Player ${this.winner} wins!`;
+            scoreboardElement.appendChild(winnerDiv);
+
+
+            const oWinsDiv = document.createElement('div');
+            oWinsDiv.classList.add('o-wins');
+            oWinsDiv.textContent = `O wins: ${this.oWins}`;
+            const xWinsDiv = document.createElement('div');
+            xWinsDiv.textContent = `X wins: ${this.xWins}`;
+            const drawsDiv = document.createElement('div');
+            drawsDiv.textContent = `Draws: ${this.draws}`;
+            scoreboardElement.appendChild(oWinsDiv);
+            scoreboardElement.appendChild(xWinsDiv);
+            scoreboardElement.appendChild(drawsDiv);
+
+        }
+    }
+
+    hideMenu() {
+        this.foreground?.removeAttribute('data-visible');
+        this.menuVisible = false;
+    }
+
+    showMenu() {
+        if (this.menuVisible) return;
+        if (!this.menuElement) return;
+        this.foreground?.setAttribute('data-visible', 'true');
+        this.menuVisible = true;
+    }
+
+    reloadGame() {
+        this.board = Array(9).fill(null);
+        this.currentPlayer = 'X';
+        this.gameOver = false;
+        this.winner = null;
+        this.winner = null;
+        this.xWins = 0;
+        this.oWins = 0;
+        this.draws = 0;
+        this.renderBoard();
+        this.updateStatus(`Player ${this.currentPlayer}'s turn`);
+        this.renderScoreboard();
+    }
+
     resetGame(player: Player) {
         this.board = Array(9).fill(null);
         this.switchPlayer(player);
         this.gameOver = false;
-        this.xWins = 0;
-        this.oWins = 0;
-        this.draws = 0;
+        this.winner = null;
         this.renderBoard();
         this.updateStatus(`Player ${player}'s turn`);
         this.renderScoreboard();
@@ -153,8 +187,6 @@ export default class TicTacToe {
         this.renderBoard();
         const winnerOrDraw = this.checkWinner();
         if (winnerOrDraw) {
-
-            this.updateScore();
             if (this.resetButtonElement) {
                 this.resetButtonElement.addEventListener('click', () => {
                     if (nextPlayer) {
@@ -195,7 +227,8 @@ export default class TicTacToe {
             const [a, b, c] = combination;
             if (this.board[a] && this.board[a] === this.board[b] && this.board[a] === this.board[c]) {
                 this.gameOver = true;
-                this.updateStatus(`${this.currentPlayer} wins!`);
+                this.winner = this.currentPlayer;
+                this.updateScore();
                 return true;
             }
         }
@@ -203,8 +236,7 @@ export default class TicTacToe {
         const movesLeft = this.board.filter(cell => cell === null).length;
         if (movesLeft === 0) {
             this.gameOver = true;
-            this.updateStatus('Draw!');
-            this.draws++;
+            this.updateScore();
             this.renderScoreboard();
             return true;
         }
@@ -220,34 +252,26 @@ export default class TicTacToe {
     }
 
     updateScore() {
-        switch (this.currentPlayer) {
+        switch (this.winner) {
             case 'X':
                 this.xWins++;
                 break;
             case 'O':
                 this.oWins++;
                 break;
+            default:
+                this.draws++;
+                break;
+        }
+
+        if (this.winner) {
+            this.updateStatus(`${this.winner} wins!`);
+        } else {
+            this.updateStatus('Draw!');
         }
 
         this.renderScoreboard();
     }
 
-    renderScoreboard() {
-        const scoreboardElement = this.scoreboardElement;
-
-        if (scoreboardElement) {
-            scoreboardElement.innerHTML = '';
-            const oWinsDiv = document.createElement('div');
-            oWinsDiv.classList.add('o-wins');
-            oWinsDiv.textContent = `O wins: ${this.oWins}`;
-            const xWinsDiv = document.createElement('div');
-            xWinsDiv.textContent = `X wins: ${this.xWins}`;
-            const drawsDiv = document.createElement('div');
-            drawsDiv.textContent = `Draws: ${this.draws}`;
-            scoreboardElement.appendChild(oWinsDiv);
-            scoreboardElement.appendChild(xWinsDiv);
-            scoreboardElement.appendChild(drawsDiv);
-        }
-    }
 }
 
