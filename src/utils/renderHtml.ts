@@ -19,13 +19,24 @@ class RenderHtmlPage {
     this.language = language;
   }
 
+  setTitle(title: string) {
+    this.title = title;
+  }
+
   setDescription(description: string) {
     this.description = description;
   }
 
-  // Method to set body content
   setBody(content: string) {
     this.bodyContent = content;
+  }
+
+  addBody(content: string) {
+    this.bodyContent += content;
+  }
+
+  clearBody() {
+    this.bodyContent = '';
   }
 
   renderLayout(): string {
