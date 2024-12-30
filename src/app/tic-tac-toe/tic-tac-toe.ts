@@ -122,9 +122,12 @@ export default class TicTacToe {
 
             const winnerDiv = document.createElement('div');
             winnerDiv.classList.add('winner');
-            winnerDiv.textContent = `Player ${this.winner} wins!`;
+            if (this.winner) {
+                winnerDiv.textContent = `Player ${this.winner} wins!`;
+            } else {
+                winnerDiv.textContent = 'This game is a draw!';
+            }
             scoreboardElement.appendChild(winnerDiv);
-
 
             const oWinsDiv = document.createElement('div');
             oWinsDiv.classList.add('o-wins');
