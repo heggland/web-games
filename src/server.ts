@@ -3,6 +3,12 @@ import * as path from "path";
 import * as fs from "fs";
 import { IncomingMessage, ServerResponse } from "http";
 import { transformSync } from "esbuild";
+import * as dotenv from "dotenv";
+dotenv.config();
+
+const PORT = process.env.PORT || 3000;
+const NODE_ENV = process.env.NODE_ENV || "production";
+
 import RenderHtmlPage from "./utils/renderHtml";
 
 const server = http.createServer((req: IncomingMessage, res: ServerResponse) => {
@@ -53,7 +59,7 @@ const server = http.createServer((req: IncomingMessage, res: ServerResponse) => 
         const html = new RenderHtmlPage("web-games");
         html.setDescription("Games made for fun");
 
-        const appPath = "./app/index.ts";
+        const appPath = `app/index.js`;
         html.addScript(appPath);
 
         const htmlContent = html.renderLayout();
@@ -67,6 +73,6 @@ const server = http.createServer((req: IncomingMessage, res: ServerResponse) => 
     }
 });
 
-server.listen(3000, () => {
-    console.log("Server is running on http://localhost:3000");
+server.listen(PORT, () => {
+    console.log(`Server is running in ${NODE_ENV} mode on http://localhost:${PORT}`);
 });

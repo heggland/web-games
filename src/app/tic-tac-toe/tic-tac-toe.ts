@@ -182,6 +182,7 @@ export default class TicTacToe {
     }
 
     handleCellClick(index: number) {
+
         if (this.gameOver || this.board[index]) return;
 
         const nextPlayer = this.getNextPlayer();
