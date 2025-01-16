@@ -7,7 +7,7 @@ class RenderHtmlPage {
   private author: string = '';
   private robots: string = '';
   private bodyContent: string = '';
-  private cssContent: string = '';
+  private cssSource: string = '';
   private scripts: string[] = [];
 
   addScript(scriptPath: string) {
@@ -31,6 +31,10 @@ class RenderHtmlPage {
     this.bodyContent = content;
   }
 
+  addCssSource(cssSource: string) {
+    this.cssSource = cssSource;
+  }
+
   addBody(content: string) {
     this.bodyContent += content;
   }
@@ -48,7 +52,7 @@ class RenderHtmlPage {
                 <meta name="viewport" content="width=device-width, initial-scale=1.0">
                 <title>${this.title}</title>
                 <meta name="description" content="${this.description}">
-                <link rel="stylesheet" href="styles.css">
+                <link rel="stylesheet" href="${this.cssSource}">
                 <meta name="keywords" content="${this.keywords.join(',')}">
                 <meta name="author" content="${this.author}">
                 <meta name="robots" content="${this.robots}">
