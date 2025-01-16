@@ -1,83 +1,105 @@
-"use strict";
-class TicTacToe {
+type Player = 'X' | 'O' | null;
+
+export default class TicTacToe {
+    private board: Player[];
+    private currentPlayer: Player;
+    private gameOver: boolean = false;
+    private winner: Player | null = null;
+    private xWins: number = 0;
+    private oWins: number = 0;
+    private draws: number = 0;
+
+    private menuVisible: boolean = false;
+    private foreground: HTMLDivElement | null = null;
+    private menuElement: HTMLDivElement | null = null;
+    private scoreboardElement: HTMLDivElement | null = null;
+    private resetButtonElement: HTMLButtonElement | null = null;
+    private playAgainButtonElement: HTMLButtonElement | null = null;
+    private boardElement: HTMLDivElement | null = null;
+    private statusElement: HTMLDivElement | null = null;
+
     constructor() {
-        var _a;
-        this.gameOver = false;
-        this.xWins = 0;
-        this.oWins = 0;
-        this.draws = 0;
-        this.menuVisible = false;
-        this.foreground = null;
-        this.menuElement = null;
-        this.scoreboardElement = null;
-        this.resetButtonElement = null;
-        this.boardElement = null;
-        this.statusElement = null;
         this.board = Array(9).fill(null);
         this.currentPlayer = 'X';
         this.renderGame();
+
         if (this.menuVisible) {
-            (_a = this.foreground) === null || _a === void 0 ? void 0 : _a.setAttribute('data-visible', 'true');
+            this.foreground?.setAttribute('data-visible', 'true');
         }
+
     }
+
     renderGame() {
-        const container = document.createElement('div');
+        const container= document.createElement('div');
         container.classList.add('container');
+
         const header = document.createElement('div');
         header.classList.add('header');
         container.appendChild(header);
+
         const title = document.createElement('h1');
         title.textContent = 'Tic Tac Toe';
         container.appendChild(title);
+
         const foreground = document.createElement('div');
         foreground.id = 'foreground';
         container.appendChild(foreground);
+
         const menu = document.createElement('div');
         menu.id = 'menu';
         foreground.appendChild(menu);
         this.foreground = foreground;
         this.menuElement = menu;
+
         const scoreboardElement = document.createElement('div');
         scoreboardElement.id = 'scoreboard';
         this.scoreboardElement = scoreboardElement;
         menu.appendChild(scoreboardElement);
+
+        const playAgainButton = document.createElement('button');
+        playAgainButton.textContent = 'Play Again';
+        playAgainButton.classList.add('play-again-button');
+
+        playAgainButton.addEventListener('click', () => {
+            const player = this.getNextPlayer();
+            this.resetGame(player);
+            this.hideMenu();
+        });
+        this.playAgainButtonElement = playAgainButton;
+
+        menu.appendChild(playAgainButton);
+
         const resetButton = document.createElement('button');
         resetButton.textContent = 'Reset';
         resetButton.classList.add('reset-button');
         resetButton.addEventListener('click', () => {
+            this.reloadGame();
             this.hideMenu();
         });
         this.resetButtonElement = resetButton;
+
+
         menu.appendChild(resetButton);
+
         const boardElement = document.createElement('div');
         boardElement.classList.add('board');
         boardElement.id = 'board';
         this.boardElement = boardElement;
         container.appendChild(boardElement);
+
         const statusElement = document.createElement('div');
         statusElement.classList.add('status');
         statusElement.id = 'status';
         this.statusElement = statusElement;
         container.appendChild(statusElement);
+
         document.body.appendChild(container);
+
         this.renderBoard();
         this.updateStatus(`Player ${this.currentPlayer}'s turn`);
         this.renderScoreboard();
     }
-    hideMenu() {
-        var _a;
-        (_a = this.foreground) === null || _a === void 0 ? void 0 : _a.removeAttribute('data-visible');
-        this.menuVisible = false;
-    }
-    showMenu() {
-        var _a;
-        if (this.menuVisible)
-            return;
-        if (!this.menuElement)
-            return;
-        (_a = this.foreground) === null || _a === void 0 ? void 0 : _a.setAttribute('data-visible', 'true');
-        this.menuVisible = true;
-    }
+
     renderBoard() {
         const boardElement = this.boardElement;
         if (boardElement) {
@@ -91,31 +113,89 @@ class TicTacToe {
             });
         }
     }
-    resetGame(player) {
-        var _a;
+
+    renderScoreboard() {
+        const scoreboardElement = this.scoreboardElement;
+
+        if (scoreboardElement) {
+            scoreboardElement.innerHTML = '';
+
+            const winnerDiv = document.createElement('div');
+            winnerDiv.classList.add('winner');
+            if (this.winner) {
+                winnerDiv.textContent = `Player ${this.winner} wins!`;
+            } else {
+                winnerDiv.textContent = 'This game is a draw!';
+            }
+            scoreboardElement.appendChild(winnerDiv);
+
+            const oWinsDiv = document.createElement('div');
+            oWinsDiv.classList.add('o-wins');
+            oWinsDiv.textContent = `O wins: ${this.oWins}`;
+            const xWinsDiv = document.createElement('div');
+            xWinsDiv.textContent = `X wins: ${this.xWins}`;
+            const drawsDiv = document.createElement('div');
+            drawsDiv.textContent = `Draws: ${this.draws}`;
+            scoreboardElement.appendChild(oWinsDiv);
+            scoreboardElement.appendChild(xWinsDiv);
+            scoreboardElement.appendChild(drawsDiv);
+
+        }
+    }
+
+    hideMenu() {
+        this.foreground?.removeAttribute('data-visible');
+        this.menuVisible = false;
+    }
+
+    showMenu() {
+        if (this.menuVisible) return;
+        if (!this.menuElement) return;
+        this.foreground?.setAttribute('data-visible', 'true');
+        this.menuVisible = true;
+    }
+
+    reloadGame() {
+        this.board = Array(9).fill(null);
+        this.currentPlayer = 'X';
+        this.gameOver = false;
+        this.winner = null;
+        this.winner = null;
+        this.xWins = 0;
+        this.oWins = 0;
+        this.draws = 0;
+        this.renderBoard();
+        this.updateStatus(`Player ${this.currentPlayer}'s turn`);
+        this.renderScoreboard();
+    }
+
+    resetGame(player: Player) {
         this.board = Array(9).fill(null);
         this.switchPlayer(player);
         this.gameOver = false;
+        this.winner = null;
         this.renderBoard();
         this.updateStatus(`Player ${player}'s turn`);
         this.renderScoreboard();
-        (_a = this.foreground) === null || _a === void 0 ? void 0 : _a.classList.add('hidden');
+
+        this.foreground?.classList.add('hidden');
     }
-    handleCellClick(index) {
-        if (this.gameOver || this.board[index])
-            return;
+
+    handleCellClick(index: number) {
+
+        if (this.gameOver || this.board[index]) return;
+
         const nextPlayer = this.getNextPlayer();
+
         this.board[index] = this.currentPlayer;
         this.renderBoard();
         const winnerOrDraw = this.checkWinner();
         if (winnerOrDraw) {
-            this.updateScore();
             if (this.resetButtonElement) {
                 this.resetButtonElement.addEventListener('click', () => {
                     if (nextPlayer) {
                         this.resetGame(nextPlayer);
-                    }
-                    else {
+                    } else {
                         this.resetGame('X');
                     }
                 });
@@ -126,12 +206,15 @@ class TicTacToe {
         this.updateStatus(`Player ${nextPlayer}'s turn`);
         this.switchPlayer(nextPlayer);
     }
+
     getNextPlayer() {
         return this.currentPlayer === 'X' ? 'O' : 'X';
     }
-    switchPlayer(nextPlayer) {
+
+    switchPlayer(nextPlayer: Player) {
         this.currentPlayer = nextPlayer;
     }
+
     checkWinner() {
         const winningCombinations = [
             [0, 1, 2],
@@ -143,28 +226,37 @@ class TicTacToe {
             [0, 4, 8],
             [2, 4, 6]
         ];
+
         for (let combination of winningCombinations) {
             const [a, b, c] = combination;
             if (this.board[a] && this.board[a] === this.board[b] && this.board[a] === this.board[c]) {
                 this.gameOver = true;
-                this.updateStatus(`${this.currentPlayer} wins!`);
+                this.winner = this.currentPlayer;
+                this.updateScore();
                 return true;
             }
         }
-        if (!this.board.includes(null)) {
+
+        const movesLeft = this.board.filter(cell => cell === null).length;
+        if (movesLeft === 0) {
             this.gameOver = true;
-            this.updateStatus('Draw!');
+            this.updateScore();
+            this.renderScoreboard();
             return true;
         }
+
+        return false;
     }
-    updateStatus(message) {
+
+    updateStatus(message: string) {
         const statusElement = this.statusElement;
         if (statusElement) {
             statusElement.textContent = message;
         }
     }
+
     updateScore() {
-        switch (this.currentPlayer) {
+        switch (this.winner) {
             case 'X':
                 this.xWins++;
                 break;
@@ -175,23 +267,14 @@ class TicTacToe {
                 this.draws++;
                 break;
         }
+
+        if (this.winner) {
+            this.updateStatus(`${this.winner} wins!`);
+        } else {
+            this.updateStatus('Draw!');
+        }
+
         this.renderScoreboard();
     }
-    renderScoreboard() {
-        const scoreboardElement = this.scoreboardElement;
-        if (scoreboardElement) {
-            scoreboardElement.innerHTML = '';
-            const oWinsDiv = document.createElement('div');
-            oWinsDiv.classList.add('o-wins');
-            oWinsDiv.textContent = `O wins: ${this.oWins}`;
-            const xWinsDiv = document.createElement('div');
-            xWinsDiv.textContent = `X wins: ${this.xWins}`;
-            const drawsDiv = document.createElement('div');
-            drawsDiv.textContent = `Draws: ${this.draws}`;
-            scoreboardElement.appendChild(oWinsDiv);
-            scoreboardElement.appendChild(xWinsDiv);
-            scoreboardElement.appendChild(drawsDiv);
-        }
-    }
 }
-new TicTacToe();
+
