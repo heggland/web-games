@@ -13,7 +13,7 @@
   "devDependencies": {
     "@types/ws": "^8.5.13",
     "concurrently": "^9.1.1",
-    "esbuild": "^0.24.2",
+    "esbuild": "^0.25.0",
     "npm-run-all": "^4.1.5",
     "ts-node": "^10.9.2",
     "typescript": "^5.5.3"
